@@ -11,10 +11,10 @@ public class Restart : MonoBehaviour
 
     public void Start()
     {
-        restartButton.onClick.AddListener(restartGame);
+        restartButton.onClick.AddListener(RestartGame);
     }
 
-    public void restartGame()
+    private void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
