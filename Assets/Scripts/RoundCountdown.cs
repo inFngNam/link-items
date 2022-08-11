@@ -23,9 +23,15 @@ public class RoundCountdown : MonoBehaviour
     {
         float currentTime = 0.0f;
 
+        bool isGameOver = gameObject.GetComponent<GameController>().IsGameOver();
+
         if (roundTimeLeft > 0)
         {
-            roundTimeLeft -= Time.deltaTime;
+            if (!isGameOver)
+            {
+                roundTimeLeft -= Time.deltaTime;
+            }
+
             currentTime = roundTimeLeft > 0 ? roundTimeLeft : 0.0f;
 
             if (currentTime == 0.0f)

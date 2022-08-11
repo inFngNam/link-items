@@ -113,15 +113,14 @@ public class GameController : MonoBehaviour
         slider.value = 0.0f;
     }
 
-    public void SetGameOver()
-    {
-        isGameOver = true;
-        ResetItems();
-    }
-
     public bool IsSelected()
     {
         return isSelected;
+    }
+
+    public GameObject GetFirstItem()
+    {
+        return firstItem;
     }
 
     public void SelectFirstItem(GameObject item)
@@ -146,9 +145,11 @@ public class GameController : MonoBehaviour
         {
             Item firstItemComponent = firstItem.GetComponent<Item>();
             Item secondItemComponent = secondItem.GetComponent<Item>();
+            bool isConnection = GetComponent<Board>().CheckConnection(firstItemComponent.row, firstItemComponent.column, secondItemComponent.row, secondItemComponent.column);
 
-            if (firstItemComponent.value == secondItemComponent.value)
+            if (firstItemComponent.value == secondItemComponent.value && isConnection)
             {
+                GetComponent<Board>().Clear(firstItemComponent.row, firstItemComponent.column, secondItemComponent.row, secondItemComponent.column);
                 Destroy(firstItem);
                 Destroy(secondItem);
                 AddScore();
@@ -158,6 +159,7 @@ public class GameController : MonoBehaviour
                 if (clearItems >= totalItems)
                 {
                     isGameOver = true;
+                    ClearCombo();
                 }
             }
             else
@@ -181,11 +183,21 @@ public class GameController : MonoBehaviour
         score = score + point + (int) currentCombo * 10;
     }
 
+    public void SetGameOver()
+    {
+        isGameOver = true;
+        ResetItems();
+    }
+
+    public bool IsGameOver()
+    {
+        return isGameOver;
+    }
+
     private void CheckWin()
     {
         if (clearItems >= totalItems && isGameOver)
         {
-            ResetItems();
             resultText.text = "Pro !!!";
         }
         else if (isGameOver)

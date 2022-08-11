@@ -8,8 +8,8 @@ public class Item : MonoBehaviour
     [SerializeField]
     private GameObject itemBackground;
 
-    public int row_index;
-    public int column_index;
+    public int row;
+    public int column;
     public int value;
 
     public void OnMouseDown()
@@ -18,7 +18,12 @@ public class Item : MonoBehaviour
 
         if (gameController.IsSelected())
         {
-            gameController.SelectSecondItem(gameObject);
+            var firstItem = gameController.GetFirstItem();
+
+            if (firstItem != gameObject)
+            {
+                gameController.SelectSecondItem(gameObject);
+            }
         }
         else
         {
