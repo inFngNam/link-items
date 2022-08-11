@@ -13,6 +13,8 @@ public class Board : MonoBehaviour
     private Sprite[] itemSprites;
     private int totalItemSprites;
 
+    private List<GameObject> items;
+
     static int totalColumns = 16;
     static int totalRows = 8;
     private int totalItems = 16 * 8;
@@ -22,7 +24,6 @@ public class Board : MonoBehaviour
     private float start_x = -7.5f;
     private float start_y = 3.5f;
 
-    private List<int> items;
     private List<List<int>> connectedItems;
 
     public int GetTotalItems()
@@ -32,33 +33,33 @@ public class Board : MonoBehaviour
 
     public void Start()
     {
+        items = new List<GameObject>();
         itemSprites = Resources.LoadAll<Sprite>("Items");
         totalItemSprites = itemSprites.Length;
-
-        GetListItems();
-        SpawnTiles();
+        SpawnTiles(GetListItems());
     }
 
-    private void GetListItems()
+    private List<int> GetListItems()
     {
-        items = new List<int>();
+        List<int> listItems = new List<int>();
         for (int index = 0; index < totalItems / 2; index++)
         {
             int item_id = Random.Range(0, totalItemSprites); 
-            items.Add(item_id);
-            items.Add(item_id);
+            listItems.Add(item_id);
+            listItems.Add(item_id);
         }
 
-        for (int index = 0; index < items.Count; index++)
+        for (int index = 0; index < listItems.Count; index++)
         {
-            int temp = items[index];
-            int randomIndex = Random.Range(index, items.Count);
-            items[index] = items[randomIndex];
-            items[randomIndex] = temp;
+            int temp = listItems[index];
+            int randomIndex = Random.Range(index, listItems.Count);
+            listItems[index] = listItems[randomIndex];
+            listItems[randomIndex] = temp;
         }
+        return listItems;
     }
 
-    private void SpawnTiles()
+    private void SpawnTiles(List<int> listItems)
     {
         int index = 0;
         grid = new int[totalRows, totalColumns];
@@ -77,7 +78,7 @@ public class Board : MonoBehaviour
                 var itemComponent = item.GetComponent<Item>();
                 itemComponent.row = row;
                 itemComponent.column = column;
-                itemComponent.value = items[index];
+                itemComponent.value = listItems[index];
 
                 var spriteRender = item.GetComponent<SpriteRenderer>();
                 spriteRender.sortingOrder = 2;
@@ -85,6 +86,8 @@ public class Board : MonoBehaviour
                 index += 1;
 
                 rowItems.Add(itemComponent.value);
+
+                items.Add(item);
             }
             connectedItems.Add(rowItems);
         }
@@ -94,17 +97,6 @@ public class Board : MonoBehaviour
     {
         connectedItems[firstItemRow][firstItemColumn] = -1;
         connectedItems[secondItemRow][secondItemColumn] = -1;
-
-        var msg = "";
-        for (int j = 0; j < connectedItems.Count; j++)
-        {
-            for (int i = 0; i < connectedItems[0].Count; i++)
-            {
-                msg += " " + connectedItems[j][i].ToString();
-            }
-            msg += "\n";
-        }
-        // Debug.Log(msg);
     }
 
     class Node
@@ -170,17 +162,6 @@ public class Board : MonoBehaviour
                 }
             }
         }
-
-        var msg = "";
-        for (int j = 0; j < visited.GetLength(0); j++)
-        {
-            for (int i = 0; i < visited.GetLength(1); i++)
-            {
-                msg += " " + (visited[j, i] ? 1 : 0).ToString();
-            }
-            msg += "\n";
-        }
-        Debug.Log(msg);
         return visited[secondItemRow, secondItemColumn];
     }
 
@@ -233,6 +214,46 @@ public class Board : MonoBehaviour
             {
                 newNode.isHalfExpandable = true;
             }
+        }
+    }
+
+    public void Change()
+    {
+        List<int> remainItems = new List<int>();
+
+        for (int row = 0; row < connectedItems.Count; row++)
+        {
+            for (int column = 0; column < connectedItems[0].Count; column++)
+            {
+                if (connectedItems[row][column] != -1)
+                {
+                    remainItems.Add(connectedItems[row][column]);
+                }
+            }
+        }
+
+        for (int index = 0; index < remainItems.Count; index++)
+        {
+            int temp = remainItems[index];
+            int randomIndex = Random.Range(index, remainItems.Count);
+            remainItems[index] = remainItems[randomIndex];
+            remainItems[randomIndex] = temp;
+        }
+
+        items = items.Where(item => item != null).ToList();
+
+        for (int index = 0; index < remainItems.Count; index++)
+        {
+            int value = remainItems[index];
+
+            GameObject item = items[index];
+
+            Item itemComponent = item.GetComponent<Item>();
+            itemComponent.value = value;
+
+            var spriteRender = item.GetComponent<SpriteRenderer>();
+            spriteRender.sortingOrder = 2;
+            spriteRender.sprite = itemSprites[itemComponent.value];
         }
     }
 }

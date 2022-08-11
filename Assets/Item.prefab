@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemBackground: {fileID: 6208465134375701183}
-  row_index: 0
-  column_index: 0
+  row: 0
+  column: 0
   value: 0
 --- !u!212 &4282761084103571704
 SpriteRenderer:
