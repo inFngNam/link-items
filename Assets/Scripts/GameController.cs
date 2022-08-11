@@ -166,6 +166,7 @@ public class GameController : MonoBehaviour
             {
                 firstItem.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.clear;
                 ClearCombo();
+                score -= 50;
             }
         }
     }
@@ -181,6 +182,11 @@ public class GameController : MonoBehaviour
     {
         int point = 100;
         score = score + point + (int) currentCombo * 10;
+    }
+
+    public void MinusChangeScore(int totalChanges)
+    {
+        score -= 50 * totalChanges;
     }
 
     public void SetGameOver()
