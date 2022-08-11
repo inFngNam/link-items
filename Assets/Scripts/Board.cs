@@ -176,7 +176,7 @@ public class Board : MonoBehaviour
         {
             for (int i = 0; i < visited.GetLength(1); i++)
             {
-                msg += " " + visited[j, i].ToString();
+                msg += " " + (visited[j, i] ? 1 : 0).ToString();
             }
             msg += "\n";
         }
@@ -211,7 +211,7 @@ public class Board : MonoBehaviour
         {
             if (connectedItems[newNode.row][newNode.column] == -1)
             {
-                return true;
+                return currentNode.isHalfExpandable || currentNode.isFullExpandable;
             }
             else
             {
