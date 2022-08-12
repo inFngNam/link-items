@@ -28,7 +28,7 @@ public class Item : MonoBehaviour
         else
         {
             var itemBackgroundSpriteRender = itemBackground.GetComponent<SpriteRenderer>();
-            itemBackgroundSpriteRender.color = new Color(253.0f/255.0f, 225.0f/255.0f, 225.0f/255.0f, 38.0f/255.0f);
+            itemBackgroundSpriteRender.color = new Color(121f/255f, 185f/255f, 183f/255f, 72f/255f);
             gameController.SelectFirstItem(gameObject);
         }
     }
