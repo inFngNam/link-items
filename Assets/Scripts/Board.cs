@@ -220,7 +220,6 @@ public class Board : MonoBehaviour
     public void Change()
     {
         List<int> remainItems = new List<int>();
-
         for (int row = 0; row < connectedItems.Count; row++)
         {
             for (int column = 0; column < connectedItems[0].Count; column++)
@@ -240,12 +239,26 @@ public class Board : MonoBehaviour
             remainItems[randomIndex] = temp;
         }
 
+
+        int remainItemIndex = 0;
+
+        for (int row = 0; row < connectedItems.Count; row++)
+        {
+            for (int column = 0; column < connectedItems[0].Count; column++)
+            {
+                if (connectedItems[row][column] != -1)
+                {
+                    connectedItems[row][column] = remainItems[remainItemIndex];
+                    remainItemIndex += 1;
+                }
+            }
+        }
+
         items = items.Where(item => item != null).ToList();
 
         for (int index = 0; index < remainItems.Count; index++)
         {
             int value = remainItems[index];
-
             GameObject item = items[index];
 
             Item itemComponent = item.GetComponent<Item>();
