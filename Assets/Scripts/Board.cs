@@ -6,47 +6,79 @@ using UnityEngine.Tilemaps;
 
 public class Board : MonoBehaviour
 {
+    class Node
+    {
+        public int column, row;
+        public bool isFullExpandable, isHalfExpandable;
+ 
+        public Node(int row, int column, bool isFullExpandable) 
+        {
+            this.row = row;
+            this.column = column;
+            this.isFullExpandable = isFullExpandable;
+            this.isHalfExpandable = isFullExpandable;
+        }
+
+        public bool IsBorder()
+        {
+            return this.row == 0 || this.row == totalRows - 1 || this.column == 0 || this.column == totalColumns - 1;
+        }
+
+        public bool IsCorner()
+        {
+            return (this.row == 0 || this.row == totalRows - 1) && (this.column == 0 || this.column == totalColumns - 1);
+        }
+    }
 
     [SerializeField]
     private GameObject itemPrefab;
     [SerializeField]
     private Sprite[] itemSprites;
-    private int totalItemSprites;
 
     private List<GameObject> items;
 
-    static int totalColumns = 16;
-    static int totalRows = 8;
-    private int totalItems = 16 * 8;
+    static int totalColumns = 4;
+    static int totalRows = 4;
+    static int totalItems = 4 * 4;
     
-    private int[,] grid;
-
     private float start_x = -7.5f;
     private float start_y = 3.5f;
 
-    private List<List<int>> connectedItems;
+    private List<List<int>> board;
+
+    private List<int> listItemIDs;
 
     public int GetTotalItems()
     {
         return totalItems;
     }
 
-    public void Start()
+    private void Start()
     {
         items = new List<GameObject>();
         itemSprites = Resources.LoadAll<Sprite>("Items");
-        totalItemSprites = itemSprites.Length;
+
+        listItemIDs = new List<int>();
+        board = new List<List<int>>();
+
         SpawnTiles(GetListItems());
+    }
+
+    private void Update()
+    {
+        AutoChangeBoard();
     }
 
     private List<int> GetListItems()
     {
         List<int> listItems = new List<int>();
+
         for (int index = 0; index < totalItems / 2; index++)
         {
-            int item_id = Random.Range(0, totalItemSprites); 
-            listItems.Add(item_id);
-            listItems.Add(item_id);
+            int itemID = Random.Range(0, itemSprites.Length);
+            listItems.Add(itemID);
+            listItems.Add(itemID);
+            listItemIDs.Add(itemID);
         }
 
         for (int index = 0; index < listItems.Count; index++)
@@ -56,15 +88,15 @@ public class Board : MonoBehaviour
             listItems[index] = listItems[randomIndex];
             listItems[randomIndex] = temp;
         }
+
+        DebugListItemIDs();
+
         return listItems;
     }
 
     private void SpawnTiles(List<int> listItems)
     {
         int index = 0;
-        grid = new int[totalRows, totalColumns];
-
-        connectedItems = new List<List<int>>();
 
         for (int row = 0; row < totalRows; row++)
         {
@@ -86,40 +118,20 @@ public class Board : MonoBehaviour
                 index += 1;
 
                 rowItems.Add(itemComponent.value);
-
                 items.Add(item);
             }
-            connectedItems.Add(rowItems);
+            board.Add(rowItems);
         }
     }
 
     public void Clear(int firstItemRow, int firstItemColumn, int secondItemRow, int secondItemColumn)
     {
-        connectedItems[firstItemRow][firstItemColumn] = -1;
-        connectedItems[secondItemRow][secondItemColumn] = -1;
-    }
+        int value = board[firstItemRow][firstItemColumn];
 
-    class Node
-    {
-        public int column, row;
-        public bool isFullExpandable, isHalfExpandable;
- 
-        public Node(int row, int column, bool isFullExpandable) 
-        {
-            this.row = row;
-            this.column = column;
-            this.isFullExpandable = isFullExpandable;
-            this.isHalfExpandable = isFullExpandable;
-        }
+        board[firstItemRow][firstItemColumn] = -1;
+        board[secondItemRow][secondItemColumn] = -1;
 
-        public bool IsBorder()
-        {
-            if (this.row == 0 || this.row == totalRows - 1 || this.column == 0 || this.column == totalColumns - 1)
-            {
-                return true;
-            }
-            return false;
-        }
+        listItemIDs.Remove(value);
     }
 
     public bool CheckConnection(int firstItemRow, int firstItemColumn, int secondItemRow, int secondItemColumn)
@@ -162,6 +174,8 @@ public class Board : MonoBehaviour
                 }
             }
         }
+
+        DebugBoard(visited);
         return visited[secondItemRow, secondItemColumn];
     }
 
@@ -186,79 +200,77 @@ public class Board : MonoBehaviour
         }
         else if (currentNode.isHalfExpandable)
         {
-            return newNode.IsBorder();
-        }
-        else
-        {
-            if (connectedItems[newNode.row][newNode.column] == -1)
-            {
-                return currentNode.isHalfExpandable || currentNode.isFullExpandable;
-            }
-            else
+            if (currentNode.IsCorner())
             {
                 return false;
             }
+            else
+            {
+               return newNode.IsBorder();
+            }
         }
+        return false;
     }
 
     private void GetNewNodeExpandable(Node currentNode, Node newNode)
     {
-        if (connectedItems[newNode.row][newNode.column] == -1)
+        if (board[newNode.row][newNode.column] == -1)
         {
             newNode.isFullExpandable = true;
         }
-
-        if (newNode.IsBorder())
+        else
         {
-            if (currentNode.IsBorder() && (currentNode.isHalfExpandable || currentNode.isFullExpandable))
+            if (newNode.IsBorder())
             {
-                newNode.isHalfExpandable = true;
+                if (newNode.IsCorner())
+                {
+                    newNode.isHalfExpandable = false;
+                }
+                else
+                {
+                    newNode.isHalfExpandable = currentNode.IsBorder() && (currentNode.isHalfExpandable || currentNode.isFullExpandable);
+                }
             }
         }
     }
 
     public void Change()
     {
-        List<int> remainItems = new List<int>();
-        for (int row = 0; row < connectedItems.Count; row++)
+        List<int> listItems = new List<int>();
+
+        DebugListItemIDs();
+
+        for (int index = 0; index < listItemIDs.Count; index++)
         {
-            for (int column = 0; column < connectedItems[0].Count; column++)
-            {
-                if (connectedItems[row][column] != -1)
-                {
-                    remainItems.Add(connectedItems[row][column]);
-                }
-            }
+            int value = listItemIDs[index];
+            listItems.Add(value);
+            listItems.Add(value);
         }
 
-        for (int index = 0; index < remainItems.Count; index++)
+        for (int index = 0; index < listItems.Count; index++)
         {
-            int temp = remainItems[index];
-            int randomIndex = Random.Range(index, remainItems.Count);
-            remainItems[index] = remainItems[randomIndex];
-            remainItems[randomIndex] = temp;
+            int temp = listItems[index];
+            int randomIndex = Random.Range(index, listItems.Count);
+            listItems[index] = listItems[randomIndex];
+            listItems[randomIndex] = temp;
         }
 
+        var msg = "";
 
-        int remainItemIndex = 0;
-
-        for (int row = 0; row < connectedItems.Count; row++)
+        for (int index = 0; index < listItems.Count; index++)
         {
-            for (int column = 0; column < connectedItems[0].Count; column++)
-            {
-                if (connectedItems[row][column] != -1)
-                {
-                    connectedItems[row][column] = remainItems[remainItemIndex];
-                    remainItemIndex += 1;
-                }
-            }
+            msg += " " + listItems[index];
         }
+
+        Debug.Log(msg);
+
 
         items = items.Where(item => item != null).ToList();
 
-        for (int index = 0; index < remainItems.Count; index++)
+        for (int index = 0; index < items.Count; index++)
         {
-            int value = remainItems[index];
+            int value = listItems[index];
+
             GameObject item = items[index];
 
             Item itemComponent = item.GetComponent<Item>();
@@ -267,6 +279,62 @@ public class Board : MonoBehaviour
             var spriteRender = item.GetComponent<SpriteRenderer>();
             spriteRender.sortingOrder = 2;
             spriteRender.sprite = itemSprites[itemComponent.value];
+
+            board[itemComponent.row][itemComponent.column] = value;
+        }
+    }
+
+    private void DebugBoard()
+    {
+        var msg = "";
+
+        for (int row = 0; row < board.Count; row++)
+        {
+            for (int column = 0; column < board[0].Count; column++)
+            {
+                msg += " " +board[row][column];
+            }
+            msg += "\n";
+        }
+
+        Debug.Log(msg);
+    }
+
+    private void DebugBoard(bool[,] array)
+    {
+        var msg = "";
+
+        for (int row = 0; row < array.GetLength(0); row++)
+        {
+            for (int column = 0; column < array.GetLength(1); column++)
+            {
+                msg += " " + array[row, column];
+            }
+            msg += "\n";
+        }
+
+        Debug.Log(msg);
+    }
+
+    private void DebugListItemIDs()
+    {
+        var msg = "";
+
+        for (int index = 0; index < listItemIDs.Count; index++)
+        {
+            msg += " " + listItemIDs[index];
+        }
+
+        Debug.Log(msg);
+    }
+
+    private void AutoChangeBoard()
+    {
+        bool change = false;
+
+        if (change)
+        {
+            Change();
         }
     }
 }

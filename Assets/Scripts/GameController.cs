@@ -15,6 +15,19 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private Image sliderFill;
 
+    [SerializeField]
+    private AudioSource audioSource;
+    [SerializeField]
+    private AudioClip correctSound;
+    [SerializeField]
+    private AudioClip incorrectSound;
+    [SerializeField]
+    private AudioClip startGameSound;
+    [SerializeField]
+    private AudioClip gameOverSound;
+    [SerializeField]
+    private AudioClip winSound;
+
     private float currentCombo;
     private float maxCombo = 7.0f;
     private float comboDurationCountdown;
@@ -40,7 +53,10 @@ public class GameController : MonoBehaviour
 
         clearItems = 0;
         totalItems = GetComponent<Board>().GetTotalItems();
+
+        PlayStartSound();
     }
+        
 
     private void Update()
     {
@@ -139,6 +155,11 @@ public class GameController : MonoBehaviour
         ResetItems();
     }
 
+    public void PlayStartSound()
+    {
+        audioSource.PlayOneShot(startGameSound);
+    }
+
     private void CompareTwoItems()
     {
         if (firstItem != null && secondItem != null)
@@ -155,10 +176,12 @@ public class GameController : MonoBehaviour
                 AddScore();
                 KeepCombo();
                 clearItems += 2;
+                audioSource.PlayOneShot(correctSound);
 
                 if (clearItems >= totalItems)
                 {
                     isGameOver = true;
+                    audioSource.PlayOneShot(winSound);
                     ClearCombo();
                 }
             }
@@ -166,7 +189,8 @@ public class GameController : MonoBehaviour
             {
                 firstItem.transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.clear;
                 ClearCombo();
-                score -= 50;
+                score -= 20;
+                audioSource.PlayOneShot(incorrectSound);
             }
         }
     }
@@ -186,12 +210,13 @@ public class GameController : MonoBehaviour
 
     public void MinusChangeScore(int totalChanges)
     {
-        score -= 50 * totalChanges;
+        score -= 20 * totalChanges;
     }
 
     public void SetGameOver()
     {
         isGameOver = true;
+        audioSource.PlayOneShot(gameOverSound);
         ResetItems();
     }
 
