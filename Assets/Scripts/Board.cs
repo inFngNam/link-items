@@ -37,9 +37,9 @@ public class Board : MonoBehaviour
 
     private List<GameObject> items;
 
-    static int totalColumns = 4;
-    static int totalRows = 4;
-    static int totalItems = 4 * 4;
+    static int totalColumns = 16;
+    static int totalRows = 8;
+    static int totalItems = 8 * 16;
     
     private float start_x = -7.5f;
     private float start_y = 3.5f;
@@ -130,6 +130,7 @@ public class Board : MonoBehaviour
 
         board[firstItemRow][firstItemColumn] = -1;
         board[secondItemRow][secondItemColumn] = -1;
+
 
         listItemIDs.Remove(value);
     }
