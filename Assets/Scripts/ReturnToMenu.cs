@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 public class ReturnToMenu : MonoBehaviour
 {
-    [SerializeField]
-    public Button returnToMenuButton;
+    [SerializeField] public Button returnToMenuButton;
 
     public void Start()
     {

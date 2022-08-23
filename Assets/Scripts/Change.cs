@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 public class Change : MonoBehaviour
 {
-    [SerializeField]
-    private Button changeButton;
+    [SerializeField] private Button changeButton;
     private int totalChanges;
 
     public void Start()

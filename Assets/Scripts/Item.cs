@@ -13,14 +13,14 @@ public class Item : MonoBehaviour
 
     public void OnMouseDown()
     {
-        var gameController = GameObject.Find("GameController").GetComponent<GameController>();
+        GameController gameController = GameObject.Find("GameController").GetComponent<GameController>();
 
         if (gameController.IsPause() || gameController.IsGameOver())
         {
             return;
         }
 
-        var itemBackgroundSpriteRender = itemBackground.GetComponent<SpriteRenderer>();
+        SpriteRenderer itemBackgroundSpriteRender = itemBackground.GetComponent<SpriteRenderer>();
 
         if (gameController.IsSelected())
         {

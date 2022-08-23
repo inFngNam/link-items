@@ -6,15 +6,10 @@ using UnityEngine.UI;
 
 public class Pause : MonoBehaviour
 {
-    [SerializeField]
-    public Button pauseButton;
-    [SerializeField]
-    public TextMeshProUGUI pauseText;
-
-    [SerializeField]
-    public Sprite pauseImage;
-    [SerializeField]
-    public Sprite resumeImage;
+    [SerializeField] public Button pauseButton;
+    [SerializeField] public TextMeshProUGUI pauseText;
+    [SerializeField] public Sprite pauseImage;
+    [SerializeField] public Sprite resumeImage;
 
     private void Start()
     {

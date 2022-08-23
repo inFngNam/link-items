@@ -15,7 +15,6 @@ public class LevelSelectPanel : MonoBehaviour
     private void Start()
     {
         closePanelButton.onClick.AddListener(Hide);
-
         levelOneSelectButton.onClick.AddListener(SelectLevelOne);
         levelTwoSelectButton.onClick.AddListener(SelectLevelTwo);
         levelThreeSelectButton.onClick.AddListener(SelectLevelThree);

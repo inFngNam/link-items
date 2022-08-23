@@ -176,9 +176,18 @@ public class GameController : MonoBehaviour
 
             if (firstItemComponent.value == secondItemComponent.value && isConnection)
             {
-                GetComponent<Board>().Clear(firstItemComponent.row, firstItemComponent.column, secondItemComponent.row, secondItemComponent.column);
                 Destroy(firstItem);
                 Destroy(secondItem);
+
+                Board board = GetComponent<Board>();
+                board.Clear(
+                    firstItemComponent.row,
+                    firstItemComponent.column,
+                    secondItemComponent.row,
+                    secondItemComponent.column
+                );
+
+
                 AddScore();
                 KeepCombo();
                 clearItems += 2;
@@ -259,6 +268,16 @@ public class GameController : MonoBehaviour
             board.SetActive(false);
             float remainTime = GetComponent<RoundCountdown>().GetRemainTime();
             resultPanel.GetComponent<ResultPanel>().Show(clearItems >= totalItems, this.score, this.playerMaxCombo, remainTime);
+        }
+    }
+
+    public void GetHint(int totalGetHintTime)
+    {
+        Board board = GetComponent<Board>();
+        bool returnHint = board.GetHint();
+        if (returnHint)
+        {
+            score -= totalGetHintTime * 20;
         }
     }
 }
