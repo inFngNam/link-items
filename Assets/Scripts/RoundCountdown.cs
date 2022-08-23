@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class RoundCountdown : MonoBehaviour
 {
@@ -16,21 +16,21 @@ public class RoundCountdown : MonoBehaviour
 
     public void Start()
     {
-        roundTimeLeft = (float) roundTime;
+        roundTimeLeft = (float)roundTime;
     }
 
     public void Update()
     {
-        float currentTime = 0.0f;
+        if (GetComponent<GameController>().IsPause() || GetComponent<GameController>().IsGameOver())
+        {
+            return;
+        }
 
-        bool isGameOver = gameObject.GetComponent<GameController>().IsGameOver();
+        float currentTime = 0.0f;
 
         if (roundTimeLeft > 0)
         {
-            if (!isGameOver)
-            {
-                roundTimeLeft -= Time.deltaTime;
-            }
+            roundTimeLeft -= Time.deltaTime;
 
             currentTime = roundTimeLeft > 0 ? roundTimeLeft : 0.0f;
 
@@ -43,11 +43,24 @@ public class RoundCountdown : MonoBehaviour
         float minutes = Mathf.FloorToInt(currentTime / 60);
         float seconds = Mathf.FloorToInt(currentTime % 60);
 
-        if (currentTime <= 30)
+        if (currentTime <= 30f)
         {
             roundCountdownText.color = Color.red;
         }
+        else if (currentTime > (float)roundTime * 0.6f)
+        {
+            roundCountdownText.color = new Color(47f / 255f, 154f / 255f, 8f / 255f, 1f);
+        }
+        else if (currentTime <= (float)roundTime * 0.6f)
+        {
+            roundCountdownText.color = new Color(217f / 255f, 152f / 255f, 0f, 1f);
+        }
 
         roundCountdownText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    public float GetRemainTime()
+    {
+        return (float)roundTime - roundTimeLeft;
     }
 }

@@ -7,7 +7,6 @@ public class Item : MonoBehaviour
 {
     [SerializeField]
     private GameObject itemBackground;
-
     public int row;
     public int column;
     public int value;
@@ -16,19 +15,24 @@ public class Item : MonoBehaviour
     {
         var gameController = GameObject.Find("GameController").GetComponent<GameController>();
 
+        if (gameController.IsPause() || gameController.IsGameOver())
+        {
+            return;
+        }
+
+        var itemBackgroundSpriteRender = itemBackground.GetComponent<SpriteRenderer>();
+
         if (gameController.IsSelected())
         {
-            var firstItem = gameController.GetFirstItem();
-
-            if (firstItem != gameObject)
+            if (gameController.GetFirstItem() != gameObject)
             {
+                itemBackgroundSpriteRender.color = new Color(234f / 255f, 150f / 255f, 150f / 255f, 1.0f);
                 gameController.SelectSecondItem(gameObject);
             }
         }
         else
         {
-            var itemBackgroundSpriteRender = itemBackground.GetComponent<SpriteRenderer>();
-            itemBackgroundSpriteRender.color = new Color(121f/255f, 185f/255f, 183f/255f, 72f/255f);
+            itemBackgroundSpriteRender.color = new Color(234f / 255f, 150f / 255f, 150f / 255f, 1.0f);
             gameController.SelectFirstItem(gameObject);
         }
     }

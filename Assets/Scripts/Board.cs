@@ -10,8 +10,8 @@ public class Board : MonoBehaviour
     {
         public int column, row;
         public bool isFullExpandable, isHalfExpandable;
- 
-        public Node(int row, int column, bool isFullExpandable) 
+
+        public Node(int row, int column, bool isFullExpandable)
         {
             this.row = row;
             this.column = column;
@@ -31,6 +31,8 @@ public class Board : MonoBehaviour
     }
 
     [SerializeField]
+    public GameObject boardGameObject;
+    [SerializeField]
     private GameObject itemPrefab;
     [SerializeField]
     private Sprite[] itemSprites;
@@ -40,8 +42,7 @@ public class Board : MonoBehaviour
     static int totalColumns = 16;
     static int totalRows = 8;
     static int totalItems = 8 * 16;
-    
-    private float start_x = -7.5f;
+    private float start_x = -8.9f;
     private float start_y = 3.5f;
 
     private List<List<int>> board;
@@ -105,12 +106,14 @@ public class Board : MonoBehaviour
             {
                 Vector3 position = new Vector3(start_x + column, start_y - row, 0.0f);
                 GameObject item = Instantiate(itemPrefab, position, Quaternion.identity) as GameObject;
-                item.name = "("+row+", "+column+")";
+                item.name = "Item[" + row + ", " + column + "]";
 
                 var itemComponent = item.GetComponent<Item>();
                 itemComponent.row = row;
                 itemComponent.column = column;
                 itemComponent.value = listItems[index];
+
+                item.GetComponent<Transform>().localScale = new Vector3(0.83f, 0.83f, 1f);
 
                 var spriteRender = item.GetComponent<SpriteRenderer>();
                 spriteRender.sortingOrder = 2;
@@ -119,6 +122,8 @@ public class Board : MonoBehaviour
 
                 rowItems.Add(itemComponent.value);
                 items.Add(item);
+
+                item.transform.SetParent(boardGameObject.transform);
             }
             board.Add(rowItems);
         }
@@ -127,11 +132,8 @@ public class Board : MonoBehaviour
     public void Clear(int firstItemRow, int firstItemColumn, int secondItemRow, int secondItemColumn)
     {
         int value = board[firstItemRow][firstItemColumn];
-
         board[firstItemRow][firstItemColumn] = -1;
         board[secondItemRow][secondItemColumn] = -1;
-
-
         listItemIDs.Remove(value);
     }
 
@@ -156,7 +158,7 @@ public class Board : MonoBehaviour
 
             queue.Dequeue();
 
-            for(int directionIndex = 0; directionIndex < direction.GetLength(0); directionIndex++)
+            for (int directionIndex = 0; directionIndex < direction.GetLength(0); directionIndex++)
             {
                 int row = currentRow + direction[directionIndex, 0];
                 int column = currentColumn + direction[directionIndex, 1];
@@ -207,7 +209,7 @@ public class Board : MonoBehaviour
             }
             else
             {
-               return newNode.IsBorder();
+                return newNode.IsBorder();
             }
         }
         return false;
@@ -293,7 +295,7 @@ public class Board : MonoBehaviour
         {
             for (int column = 0; column < board[0].Count; column++)
             {
-                msg += " " +board[row][column];
+                msg += " " + board[row][column];
             }
             msg += "\n";
         }
