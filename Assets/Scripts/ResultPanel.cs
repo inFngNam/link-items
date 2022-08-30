@@ -11,6 +11,7 @@ public class ResultPanel : MonoBehaviour
     [SerializeField] public TextMeshProUGUI resultScoreText;
     [SerializeField] public TextMeshProUGUI resultTimePlayedText;
     [SerializeField] public TextMeshProUGUI resultHighestCombosText;
+    [SerializeField] public TextMeshProUGUI playAgainText;
     [SerializeField] public GameObject stars;
     [SerializeField] public GameObject gameOverImage;
     [SerializeField] public Button playAgainButton;
@@ -37,11 +38,37 @@ public class ResultPanel : MonoBehaviour
         float seconds = Mathf.FloorToInt(playTime % 60);
         string timeStr = string.Format("{0:00}:{1:00}", minutes, seconds);
         resultTimePlayedText.text = "Time: " + timeStr;
+
+        if (winStatus)
+        {
+            playAgainText.text = "NEXT LEVEL";
+        }
+        else
+        {
+            playAgainText.text = "PLAY AGAIN";
+        }
     }
 
     private void PlayAgain()
     {
-        SceneManager.LoadScene("GameScene");
+        if (playAgainText.text == "PLAY AGAIN")
+        {
+            SceneManager.LoadScene("GameScene");
+        }
+        else
+        {
+            int level = PlayerPrefs.GetInt("level");
+            if (level < 3)
+            {
+                level++;
+            }
+            else if (level == 3)
+            {
+                level = 1;
+            }
+            SceneManager.LoadScene("GameScene");
+        }
+
     }
 
     private void ReturnToMenu()

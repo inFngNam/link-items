@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class Hint : MonoBehaviour
 {
     [SerializeField] public Button hintButton;
+    [SerializeField] public TextMeshProUGUI hintText;
+
     private int totalGetHintTime = 0;
 
     public void Start()
@@ -16,7 +18,22 @@ public class Hint : MonoBehaviour
 
     private void GetHint()
     {
-        totalGetHintTime += 1;
-        GetComponent<GameController>().GetHint(totalGetHintTime);
+        if (hintText.text == "HINT")
+        {
+            bool hasHint = GetComponent<GameController>().GetHint(totalGetHintTime);
+            if (hasHint)
+            {
+                totalGetHintTime += 1;
+            }
+            else
+            {
+                hintText.text = "NO HINT";
+            }
+        }
+    }
+
+    public void ChangeText(string text)
+    {
+        hintText.text = text;
     }
 }

@@ -5,11 +5,8 @@ using UnityEngine.UI;
 
 public class Item : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject itemBackground;
-    public int row;
-    public int column;
-    public int value;
+    [SerializeField] private GameObject itemBackground;
+    public int row, column, value;
 
     public void OnMouseDown()
     {

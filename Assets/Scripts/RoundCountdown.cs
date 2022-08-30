@@ -6,11 +6,9 @@ using UnityEngine.UI;
 
 public class RoundCountdown : MonoBehaviour
 {
-    [SerializeField]
-    private TextMeshProUGUI roundCountdownText;
+    [SerializeField] private TextMeshProUGUI roundCountdownText;
 
-    [SerializeField]
-    private int roundTime;
+    [SerializeField] private int roundTime;
 
     private float roundTimeLeft;
 

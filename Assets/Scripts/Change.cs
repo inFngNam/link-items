@@ -23,6 +23,7 @@ public class Change : MonoBehaviour
         }
 
         GetComponent<Board>().Change();
+        GetComponent<Hint>().ChangeText("HINT");
         GetComponent<GameController>().MinusChangeScore(totalChanges);
         GetComponent<GameController>().PlayStartSound();
         totalChanges += 1;

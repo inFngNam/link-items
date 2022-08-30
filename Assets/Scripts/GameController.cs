@@ -27,11 +27,10 @@ public class GameController : MonoBehaviour
 
     private bool isGameOver;
     private bool isPause;
-
     private int score;
     private int level;
-
     private bool isSelected;
+
     private GameObject firstItem;
     private GameObject secondItem;
     private int totalItems;
@@ -59,8 +58,8 @@ public class GameController : MonoBehaviour
     {
         if (!isPause && !isGameOver)
         {
-            levelText.text = "Level: " + level;
-            scoreText.text = "Score\n" + score;
+            levelText.text = "LEVEL: " + level;
+            scoreText.text = score.ToString();
             ComboCooldown();
             ComboColor();
         }
@@ -172,21 +171,29 @@ public class GameController : MonoBehaviour
         {
             Item firstItemComponent = firstItem.GetComponent<Item>();
             Item secondItemComponent = secondItem.GetComponent<Item>();
-            bool isConnection = GetComponent<Board>().CheckConnection(firstItemComponent.row, firstItemComponent.column, secondItemComponent.row, secondItemComponent.column);
+
+            Position firstPosition = new Position(firstItemComponent.row, firstItemComponent.column);
+            Position secondPosition = new Position(secondItemComponent.row, secondItemComponent.column);
+
+            Board board = GetComponent<Board>();
+
+            bool isConnection = board.CheckConnection(firstPosition, secondPosition, true);
 
             if (firstItemComponent.value == secondItemComponent.value && isConnection)
             {
                 Destroy(firstItem);
                 Destroy(secondItem);
 
-                Board board = GetComponent<Board>();
-                board.Clear(
-                    firstItemComponent.row,
-                    firstItemComponent.column,
-                    secondItemComponent.row,
-                    secondItemComponent.column
-                );
+                board.Clear(firstPosition, secondPosition);
 
+                if (level == 2)
+                {
+                    board.UpdateBoardLevel2(firstPosition, secondPosition);
+                }
+                else if (level == 3)
+                {
+                    board.UpdateBoardLevel3(firstPosition, secondPosition);
+                }
 
                 AddScore();
                 KeepCombo();
@@ -271,13 +278,17 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void GetHint(int totalGetHintTime)
+    public bool GetHint(int totalGetHintTime)
     {
         Board board = GetComponent<Board>();
-        bool returnHint = board.GetHint();
-        if (returnHint)
+
+        bool hasHint = board.GetHint();
+
+        if (hasHint)
         {
             score -= totalGetHintTime * 20;
         }
+
+        return hasHint;
     }
 }
